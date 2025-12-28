@@ -6,6 +6,8 @@ win_height = 500
 window = display.set_mode((win_width, win_height))
 window.fill(back)
 
+pointP1 = 0
+pointP2 = 0
 game = True
 finish = False
 clock = time.Clock()
@@ -37,22 +39,37 @@ class Player(GameSprite):
         if keys[K_s] and self.rect.y < win_width - 80:
             self.rect.y += self.speed
 
-racket1 = Player('racket.png', 30, 200, 4, 50, 150)
-racket2 = Player('racket.png', 520, 200, 4, 50, 150)
-ball = GameSprite('tenis_ball.png', 200, 200, 4, 50, 50)
+racket1 = Player('racket.png', 30, 200, 4, 60, 150)
+racket2 = Player('racket.png', 520, 200, 4, 60, 150)
+ball = GameSprite('tenis_ball.png', 200, 200, 4, 60, 50)
 
 font.init()
 font = font.Font(None, 35)
-lose1 = font.render('PLAYER 1 LOSE!', True, (180, 0, 0))
-lose2 = font.render('PLAYER 2 LOSE!', True, (180, 0, 0))
-speed_x = 3
-speed_y = 3
+lose1 = font.render('LEFT LOSE!', True, (180, 0, 0))
+lose2 = font.render('RIGHT LOSE!', True, (180, 0, 0))
+poin_text1 = font.render('POINTS:', True, (0, 0, 0))
+poin_text2 = font.render('POINTS:', True, (0, 0, 0))
+restart = font.render('Press R to restart the game', True, (0, 0, 0)) 
+poin1 = font.render(str(0), True, (0, 0, 0))
+poin2 = font.render(str(0), True, (0, 0, 0))
+
+speed_x = 12
+speed_y = 12
 
 while game:
 
     for e in event.get():
         if e.type == QUIT:
             game = False
+        elif e.type == KEYDOWN:
+            if e.key == K_r and finish == True:
+                pointP1 = 0
+                pointP2 = 0
+                poin1 = font.render(str(pointP1), True, (0, 0, 0))
+                poin2 = font.render(str(pointP2), True, (0, 0, 0))
+                ball.rect.x = 250
+                ball.rect.y = 250
+                finish = False
 
     if finish != True:
         window.fill(back)
@@ -68,12 +85,33 @@ while game:
             speed_y *= -1
 
         if ball.rect.x < 0:
-            finish = True
-            window.blit(lose1, (200, 200))
+            ball.rect.x = 250
+            ball.rect.y = 250
+            pointP2 += 1
+            poin2 = font.render(str(pointP2), True, (0, 0, 0))
 
         if ball.rect.x > win_width:
+            ball.rect.x = 250
+            ball.rect.y = 250
+            pointP1 += 1
+            poin1 = font.render(str(pointP1), True, (0, 0, 0))
+
+        if pointP1 >= 6:
             finish = True
+            window.fill(back)
             window.blit(lose2, (200, 200))
+            window.blit(restart, (150, 250))
+
+        if pointP2 >= 6:
+            finish = True
+            window.fill(back)
+            window.blit(lose1, (200, 200))
+            window.blit(restart, (150, 250))
+
+        window.blit(poin_text1, (10, 10))
+        window.blit(poin_text2, (430, 10))
+        window.blit(poin1, (130, 10))
+        window.blit(poin2, (550, 10))
 
         racket1.reset()
         racket2.reset()
